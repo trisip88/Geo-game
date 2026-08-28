@@ -1,6 +1,5 @@
-import React from 'react';
-import { DiscussionEmbed } from 'disqus-react';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { MessageSquare, Sparkles, AlertCircle } from 'lucide-react';
 
 interface DisqusCommentsProps {
   articleId?: string;
@@ -10,24 +9,62 @@ interface DisqusCommentsProps {
 }
 
 export const DisqusComments: React.FC<DisqusCommentsProps> = ({
-  articleId = 'geo-game-community',
+  articleId = 'geo-game-main-hub',
   articleTitle = 'Geo-Game: Open Geography Challenge',
   articleUrl,
-  language = 'en',
+  language = 'zh_TW',
 }) => {
-  // Use current window location if available, with a fallback
-  const disqusUrl =
-    articleUrl ||
-    (typeof window !== 'undefined'
-      ? window.location.href.split('?')[0].split('#')[0]
-      : 'https://github.com/trisip88/Geo-game');
+  const [hasError, setHasError] = useState(false);
 
-  const disqusConfig = {
-    url: disqusUrl,
-    identifier: articleId,
-    title: articleTitle,
-    language: language,
-  };
+  useEffect(() => {
+    try {
+      const canonicalUrl =
+        articleUrl ||
+        (typeof window !== 'undefined'
+          ? window.location.href.split('?')[0].split('#')[0]
+          : 'https://github.com/trisip88/Geo-game');
+
+      // Setup window.disqus_config
+      (window as any).disqus_config = function () {
+        this.page.url = canonicalUrl;
+        this.page.identifier = articleId;
+        this.page.title = articleTitle;
+        this.language = language;
+      };
+
+      // Check if script already exists
+      const existingScript = document.getElementById('disqus-embed-script');
+      if (!existingScript) {
+        const d = document;
+        const s = d.createElement('script');
+        s.id = 'disqus-embed-script';
+        s.src = 'https://geo-game.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', (+new Date()).toString());
+        s.async = true;
+        s.onerror = () => {
+          setHasError(true);
+        };
+        (d.head || d.body).appendChild(s);
+      } else if ((window as any).DISQUS) {
+        // If already loaded, reset for new identifier/url
+        try {
+          (window as any).DISQUS.reset({
+            reload: true,
+            config: function () {
+              this.page.url = canonicalUrl;
+              this.page.identifier = articleId;
+              this.page.title = articleTitle;
+              this.language = language;
+            },
+          });
+        } catch {
+          // Ignore reset errors during unmounts
+        }
+      }
+    } catch {
+      setHasError(true);
+    }
+  }, [articleId, articleTitle, articleUrl, language]);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-b-8 border-indigo-200 text-slate-800">
@@ -42,14 +79,32 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
               <Sparkles className="w-4 h-4 text-pink-500" />
             </h3>
             <p className="text-xs font-bold text-slate-400">
-              Share coordinates tips, landmark insights, and high scores via Disqus
+              Disqus Forum · shortname: <code className="text-indigo-600 font-mono">geo-game</code>
             </p>
           </div>
         </div>
       </div>
 
-      <div className="min-h-[300px] w-full">
-        <DiscussionEmbed shortname="geo-game" config={disqusConfig} />
+      <div className="min-h-[220px] w-full">
+        {hasError ? (
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3 text-slate-600 text-xs font-medium">
+            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <span>
+              Disqus embed could not be loaded directly (may be blocked by browser privacy/ad-block settings). You can also participate directly on the{' '}
+              <a
+                href="https://disqus.com/home/forums/geo-game/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-indigo-600 underline font-bold"
+              >
+                geo-game forum channel
+              </a>
+              .
+            </span>
+          </div>
+        ) : (
+          <div id="disqus_thread" />
+        )}
       </div>
     </div>
   );
