@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { DiscussionEmbed } from 'disqus-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Sparkles, ExternalLink, RefreshCw } from 'lucide-react';
 
 interface DisqusCommentsProps {
@@ -10,13 +9,14 @@ interface DisqusCommentsProps {
 }
 
 export const DisqusComments: React.FC<DisqusCommentsProps> = ({
-  articleId = 'geo-game-main-hub',
-  articleTitle = 'Geo-Game: Open Geography Challenge',
+  articleId = 'geography-game-main-hub',
+  articleTitle = 'Geography Guessing Game: Discussion & Leaderboard',
   articleUrl,
   language = 'zh_TW',
 }) => {
   const [loadKey, setLoadKey] = useState(0);
   const [hasError, setHasError] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const canonicalUrl =
     articleUrl ||
@@ -24,17 +24,57 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
       ? window.location.href.split('?')[0].split('#')[0]
       : 'https://github.com/trisip88/Geo-game');
 
-  const disqusConfig = {
-    url: canonicalUrl,
-    identifier: articleId,
-    title: articleTitle,
-    language: language,
-  };
-
   useEffect(() => {
-    // Reset error status on key change
+    let isMounted = true;
     setHasError(false);
-  }, [loadKey]);
+
+    try {
+      // Define window.disqus_config
+      (window as any).disqus_config = function () {
+        this.page.url = canonicalUrl;
+        this.page.identifier = articleId;
+        this.page.title = articleTitle;
+        this.language = language;
+      };
+
+      if ((window as any).DISQUS) {
+        // If DISQUS is already present on the page, reset it with current configuration
+        try {
+          (window as any).DISQUS.reset({
+            reload: true,
+            config: function () {
+              this.page.url = canonicalUrl;
+              this.page.identifier = articleId;
+              this.page.title = articleTitle;
+              this.language = language;
+            },
+          });
+        } catch (e) {
+          console.warn('Disqus reset error:', e);
+        }
+      } else {
+        // Insert Disqus embed script
+        const existingScript = document.getElementById('disqus-embed-script');
+        if (!existingScript) {
+          const s = document.createElement('script');
+          s.id = 'disqus-embed-script';
+          s.src = 'https://geo-game.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', (+new Date()).toString());
+          s.async = true;
+          s.onerror = () => {
+            if (isMounted) setHasError(true);
+          };
+          (document.head || document.body).appendChild(s);
+        }
+      }
+    } catch {
+      if (isMounted) setHasError(true);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [articleId, articleTitle, canonicalUrl, language, loadKey]);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-b-8 border-indigo-200 text-slate-800">
@@ -55,7 +95,7 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
         </div>
       </div>
 
-      <div className="min-h-[200px] w-full" key={loadKey}>
+      <div className="min-h-[200px] w-full" ref={containerRef}>
         {hasError ? (
           <div className="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex flex-col items-center text-center gap-3 text-slate-700">
             <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
@@ -64,7 +104,7 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
             <div>
               <h4 className="font-black text-slate-900 text-sm">Disqus Discussion Channel</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-md">
-                Disqus comments can be accessed directly on the forum channel.
+                Disqus comments can be accessed directly on the forum channel or reloaded below.
               </p>
             </div>
             <div className="flex items-center gap-3 mt-2">
@@ -87,7 +127,7 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
             </div>
           </div>
         ) : (
-          <DiscussionEmbed shortname="geo-game" config={disqusConfig} />
+          <div id="disqus_thread" />
         )}
       </div>
     </div>
