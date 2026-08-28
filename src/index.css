@@ -58,3 +58,18 @@ code, pre, .font-mono {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/*
+ * Disqus compatibility with Tailwind v4.
+ *
+ * Before rendering, Disqus's embed.js samples the link colour inside
+ * #disqus_thread (getAnchorColor) to theme the thread. Its parseColor() only
+ * understands legacy hex/rgb notation, so the oklch() values Tailwind v4 emits
+ * make it throw inside loadEmbed() — the thread then silently never renders.
+ * Pinning legacy rgb() values here keeps the sampled colours parseable.
+ */
+#disqus_thread,
+#disqus_thread a {
+  color: rgb(30, 41, 59);
+  background-color: rgb(255, 255, 255);
+}
