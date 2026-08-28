@@ -14,7 +14,6 @@ import { WorldMap } from './components/WorldMap';
 import { RoundFeedback } from './components/RoundFeedback';
 import { DisqusComments } from './components/DisqusComments';
 import { MatchSummaryModal } from './components/MatchSummaryModal';
-import { PlaceAuthoringModal } from './components/PlaceAuthoringModal';
 import { HelpModal } from './components/HelpModal';
 
 const TOTAL_ROUNDS = 5;
@@ -46,7 +45,6 @@ export default function App() {
 
   // Modals state
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
-  const [showAuthoringModal, setShowAuthoringModal] = useState<boolean>(false);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [showSchemaModal, setShowSchemaModal] = useState<boolean>(false);
 
@@ -244,7 +242,6 @@ export default function App() {
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         onProbeLiveFeed={handleProbe}
-        onOpenAuthoring={() => setShowAuthoringModal(true)}
         onOpenHelp={() => setShowHelpModal(true)}
         onOpenDiscussion={() => {
           const el = document.getElementById('community-discussion-panel');
@@ -322,12 +319,6 @@ export default function App() {
           matchRecord={matchRecord}
           onPlayAgain={startNewMatch}
           onClose={() => setShowSummaryModal(false)}
-        />
-      )}
-
-      {showAuthoringModal && (
-        <PlaceAuthoringModal
-          onClose={() => setShowAuthoringModal(false)}
         />
       )}
 

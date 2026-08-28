@@ -5,7 +5,6 @@ import {
   VolumeX,
   FileCode2,
   HelpCircle,
-  FlaskConical,
   RefreshCw,
   Zap,
   MessageSquare,
@@ -21,7 +20,6 @@ interface HeaderProps {
   onToggleSound: () => void;
   onProbeLiveFeed: () => void;
   onOpenSchema?: () => void;
-  onOpenAuthoring: () => void;
   onOpenHelp: () => void;
   onOpenDiscussion?: () => void;
   onResetMatch: () => void;
@@ -37,7 +35,6 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   onProbeLiveFeed,
   onOpenSchema,
-  onOpenAuthoring,
   onOpenHelp,
   onOpenDiscussion,
   onResetMatch,
@@ -136,15 +133,6 @@ export const Header: React.FC<HeaderProps> = ({
             className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-pink-300" />}
-          </button>
-
-          <button
-            onClick={onOpenAuthoring}
-            title="Open Place Authoring Lab & API Tester"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
-          >
-            <FlaskConical className="w-3.5 h-3.5 text-yellow-300" />
-            <span className="hidden sm:inline">API Lab</span>
           </button>
 
           {onOpenSchema && (
