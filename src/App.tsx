@@ -13,6 +13,7 @@ import { ClueDossier } from './components/ClueDossier';
 import { WorldMap } from './components/WorldMap';
 import { RoundFeedback } from './components/RoundFeedback';
 import { JsonRecordViewer } from './components/JsonRecordViewer';
+import { DisqusComments } from './components/DisqusComments';
 import { MatchSummaryModal } from './components/MatchSummaryModal';
 import { PlaceAuthoringModal } from './components/PlaceAuthoringModal';
 import { HelpModal } from './components/HelpModal';
@@ -251,6 +252,10 @@ export default function App() {
         }}
         onOpenAuthoring={() => setShowAuthoringModal(true)}
         onOpenHelp={() => setShowHelpModal(true)}
+        onOpenDiscussion={() => {
+          const el = document.getElementById('community-discussion-panel');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
         onResetMatch={startNewMatch}
       />
 
@@ -295,6 +300,15 @@ export default function App() {
         {/* Live Match Record & JSON Schema Panel */}
         <div id="json-telemetry-panel" className="pt-2">
           <JsonRecordViewer matchRecord={matchRecord} />
+        </div>
+
+        {/* Community Discussion Forum (Disqus) */}
+        <div id="community-discussion-panel" className="pt-2">
+          <DisqusComments
+            articleId="geo-game-main-hub"
+            articleTitle="Geo-Game Community & Player Leaderboard Discussion"
+            language="zh_TW"
+          />
         </div>
       </main>
 
