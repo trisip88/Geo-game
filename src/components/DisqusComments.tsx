@@ -14,6 +14,9 @@ export const DisqusComments: React.FC = () => {
       s.id = 'disqus-embed-script';
       s.src = 'https://geo-game.disqus.com/embed.js';
       s.setAttribute('data-timestamp', (+new Date()).toString());
+      s.onerror = () => {
+        // Suppress unhandled third-party script failure
+      };
       (d.head || d.body).appendChild(s);
     })();
   }, []);
