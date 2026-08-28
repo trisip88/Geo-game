@@ -46,7 +46,7 @@ export const DisqusComments: React.FC = () => {
       setIsInIframe(true);
     }
 
-    // Set Disqus configuration for gracelin
+    // Set Disqus configuration for geofun
     (window as any).disqus_config = function (this: any) {
       this.page.url = window.location.href.split('#')[0];
       this.page.identifier = 'geo-game-forum';
@@ -70,7 +70,7 @@ export const DisqusComments: React.FC = () => {
       }
       const s = document.createElement('script');
       s.id = 'disqus-embed-script';
-      s.src = 'https://gracelin.disqus.com/embed.js';
+      s.src = 'https://geofun.disqus.com/embed.js';
       s.setAttribute('data-timestamp', (+new Date()).toString());
       s.async = true;
       (document.head || document.body).appendChild(s);
@@ -90,11 +90,11 @@ export const DisqusComments: React.FC = () => {
           </div>
           <div>
             <h3 className="text-base font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
-              <span>Player Ratings & Thumbs Up</span>
+              <span>Player Ratings & Community Forum</span>
               <Sparkles className="w-4 h-4 text-pink-500" />
             </h3>
             <p className="text-xs font-bold text-slate-400">
-              Disqus Forum · shortname: <code className="text-indigo-600 font-mono font-black">gracelin</code>
+              Disqus Forum · shortname: <code className="text-indigo-600 font-mono font-black">geofun</code>
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export const DisqusComments: React.FC = () => {
             </button>
           )}
           <a
-            href="https://gracelin.disqus.com/"
+            href="https://geofun.disqus.com/"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-[0_2px_0_#9D174D]"
