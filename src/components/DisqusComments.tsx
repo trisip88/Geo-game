@@ -1,24 +1,49 @@
-import React, { useEffect } from 'react';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { MessageSquare, Sparkles, RefreshCw, ExternalLink } from 'lucide-react';
 
 export const DisqusComments: React.FC = () => {
+  const [hasLoaded, setHasLoaded] = useState(false);
+
   useEffect(() => {
-    // Run Disqus universal embed code exactly as provided
-    (function () {
-      const d = document;
+    // 1. Define disqus_config on window
+    const currentUrl = typeof window !== 'undefined' ? window.location.href.split('#')[0] : '';
+    
+    (window as any).disqus_config = function (this: any) {
+      this.page.url = currentUrl;
+      this.page.identifier = 'geo-game-universal-thread';
+      this.page.title = 'Geo Game Player Forum';
+    };
+
+    // 2. If DISQUS is already on the window, call reset
+    if ((window as any).DISQUS) {
+      try {
+        (window as any).DISQUS.reset({
+          reload: true,
+          config: (window as any).disqus_config,
+        });
+        setHasLoaded(true);
+      } catch (e) {
+        console.warn('Disqus reset notice:', e);
+      }
+    } else {
+      // 3. Otherwise insert the embed.js script
       const existing = document.getElementById('disqus-embed-script');
       if (existing) {
         existing.remove();
       }
-      const s = d.createElement('script');
+      const s = document.createElement('script');
       s.id = 'disqus-embed-script';
       s.src = 'https://geo-game.disqus.com/embed.js';
       s.setAttribute('data-timestamp', (+new Date()).toString());
+      s.async = true;
+      s.onload = () => {
+        setHasLoaded(true);
+      };
       s.onerror = () => {
         // Suppress unhandled third-party script failure
       };
-      (d.head || d.body).appendChild(s);
-    })();
+      (document.head || document.body).appendChild(s);
+    }
   }, []);
 
   return (
@@ -38,9 +63,19 @@ export const DisqusComments: React.FC = () => {
             </p>
           </div>
         </div>
+
+        <a
+          href="https://geo-game.disqus.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
+        >
+          <span>Open on Disqus</span>
+          <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+        </a>
       </div>
 
-      <div className="min-h-[250px] w-full">
+      <div className="min-h-[250px] w-full relative">
         {/* Exact standard Disqus Thread */}
         <div id="disqus_thread"></div>
         <noscript>
@@ -53,3 +88,4 @@ export const DisqusComments: React.FC = () => {
     </div>
   );
 };
+
