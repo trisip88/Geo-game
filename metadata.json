@@ -1,0 +1,6 @@
+{
+  "name": "RGOGC — Geography Guessing Game",
+  "description": "A geography guessing challenge utilizing open APIs (Wikipedia, Openverse, OpenLibrary, Nominatim) with interactive map pin-dropping, progressive clues, distance scoring, and live JSON schema output.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
