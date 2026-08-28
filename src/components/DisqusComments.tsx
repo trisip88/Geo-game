@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, ExternalLink, AlertCircle, MonitorUp } from 'lucide-react';
+import { Sparkles, AlertCircle, MonitorUp } from 'lucide-react';
 
 interface ReactionItem {
   id: string;
@@ -131,15 +131,6 @@ export const DisqusComments: React.FC = () => {
               <span>Open in New Tab</span>
             </button>
           )}
-          <a
-            href="https://geofun.disqus.com/"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-[0_2px_0_#9D174D]"
-          >
-            <span>Disqus Portal</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
 
