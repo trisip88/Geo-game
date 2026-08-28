@@ -166,16 +166,22 @@ export const Header: React.FC<HeaderProps> = ({
             <HelpCircle className="w-4 h-4" />
           </button>
 
-          {onOpenDiscussion && (
-            <button
-              onClick={onOpenDiscussion}
-              title="Community Discussions & Comments"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
-            >
-              <MessageSquare className="w-3.5 h-3.5 text-cyan-300" />
-              <span className="hidden sm:inline">Forum</span>
-            </button>
-          )}
+          {/* Discussion Forum Button with Live Disqus Count Badge */}
+          <a
+            href="#disqus_thread"
+            data-disqus-identifier="geo-game-forum"
+            title="Jump to Community Discussion & Player Forum"
+            onClick={(e) => {
+              if (onOpenDiscussion) {
+                e.preventDefault();
+                onOpenDiscussion();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-400/40 text-cyan-300 transition-all hover:scale-105 active:scale-95 shadow-sm"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-cyan-300" />
+            <span className="disqus-comment-count">Comments</span>
+          </a>
 
           <button
             onClick={onResetMatch}

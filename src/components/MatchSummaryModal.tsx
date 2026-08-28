@@ -11,6 +11,7 @@ import {
   Navigation,
   Globe2,
   Clock,
+  MessageSquare,
 } from 'lucide-react';
 
 interface MatchSummaryModalProps {
@@ -22,6 +23,7 @@ interface MatchSummaryModalProps {
 export const MatchSummaryModal: React.FC<MatchSummaryModalProps> = ({
   matchRecord,
   onPlayAgain,
+  onClose,
 }) => {
   const { score, max_possible, accuracy_pct, avg_error_km } = matchRecord.totals;
 
@@ -161,13 +163,31 @@ export const MatchSummaryModal: React.FC<MatchSummaryModalProps> = ({
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <button
-            onClick={handleDownload}
-            className="w-full sm:w-auto px-5 py-3 rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-xs font-black text-indigo-700 transition-colors flex items-center justify-center gap-2 active:scale-95"
-          >
-            <Download className="w-4 h-4" />
-            <span>Download JSON Schema Log</span>
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleDownload}
+              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-xs font-black text-indigo-700 transition-colors flex items-center justify-center gap-2 active:scale-95"
+            >
+              <Download className="w-4 h-4" />
+              <span>Save Log</span>
+            </button>
+
+            <a
+              href="#disqus_thread"
+              data-disqus-identifier="geo-game-forum"
+              onClick={() => {
+                onClose();
+                setTimeout(() => {
+                  const el = document.getElementById('community-discussion-panel');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl border-2 border-yellow-200 hover:border-yellow-300 bg-yellow-50 hover:bg-yellow-100 text-xs font-black text-yellow-800 transition-colors flex items-center justify-center gap-2 active:scale-95"
+            >
+              <MessageSquare className="w-4 h-4 text-yellow-600" />
+              <span className="disqus-comment-count">Discuss Score</span>
+            </a>
+          </div>
 
           <button
             onClick={onPlayAgain}
