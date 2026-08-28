@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { ThumbsUp, Heart, Sparkles, ExternalLink, AlertCircle, MonitorUp, Trophy, Flame } from 'lucide-react';
+import { Sparkles, ExternalLink, AlertCircle, MonitorUp } from 'lucide-react';
+
+interface ReactionItem {
+  id: string;
+  label: string;
+  emoji: string;
+  svgFallback?: string;
+}
+
+const REACTION_CONFIG: ReactionItem[] = [
+  { id: 'upvote', label: 'Upvote', emoji: '👍' },
+  { id: 'funny', label: 'Funny', emoji: '😆' },
+  { id: 'love', label: 'Love', emoji: '😍' },
+  { id: 'surprised', label: 'Surprised', emoji: '😮' },
+  { id: 'angry', label: 'Angry', emoji: '😤' },
+  { id: 'sad', label: 'Sad', emoji: '😢' },
+];
 
 export const DisqusComments: React.FC = () => {
   const [isInIframe, setIsInIframe] = useState(false);
   const [reactions, setReactions] = useState<{ [key: string]: number }>(() => {
-    const saved = localStorage.getItem('geo_game_reactions');
+    const saved = localStorage.getItem('geo_game_disqus_reactions');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -12,34 +28,43 @@ export const DisqusComments: React.FC = () => {
         // fallback
       }
     }
-    return { thumbsUp: 24, love: 18, fire: 31, trophy: 15 };
+    return { upvote: 0, funny: 0, love: 1, surprised: 0, angry: 0, sad: 0 };
   });
 
-  const [userVoted, setUserVoted] = useState<{ [key: string]: boolean }>(() => {
-    const saved = localStorage.getItem('geo_game_user_voted');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        // fallback
+  const [selectedReaction, setSelectedReaction] = useState<string | null>(() => {
+    return localStorage.getItem('geo_game_selected_reaction') || 'love';
+  });
+
+  const handleSelectReaction = (id: string) => {
+    const newReactions = { ...reactions };
+    let newSelected: string | null = id;
+
+    if (selectedReaction === id) {
+      // Toggle off
+      newReactions[id] = Math.max(0, (newReactions[id] || 1) - 1);
+      newSelected = null;
+    } else {
+      // Toggle on, decrement previous if any
+      if (selectedReaction && newReactions[selectedReaction] !== undefined) {
+        newReactions[selectedReaction] = Math.max(0, newReactions[selectedReaction] - 1);
       }
+      newReactions[id] = (newReactions[id] || 0) + 1;
     }
-    return {};
-  });
 
-  const handleReaction = (type: string) => {
-    const nextVoted = { ...userVoted, [type]: !userVoted[type] };
-    const diff = userVoted[type] ? -1 : 1;
-    const nextReactions = { ...reactions, [type]: Math.max(0, (reactions[type] || 0) + diff) };
-    
-    setUserVoted(nextVoted);
-    setReactions(nextReactions);
-    localStorage.setItem('geo_game_reactions', JSON.stringify(nextReactions));
-    localStorage.setItem('geo_game_user_voted', JSON.stringify(nextVoted));
+    setReactions(newReactions);
+    setSelectedReaction(newSelected);
+    localStorage.setItem('geo_game_disqus_reactions', JSON.stringify(newReactions));
+    if (newSelected) {
+      localStorage.setItem('geo_game_selected_reaction', newSelected);
+    } else {
+      localStorage.removeItem('geo_game_selected_reaction');
+    }
   };
 
+  const totalResponses = Object.values(reactions).reduce((acc: number, curr: number) => acc + curr, 0);
+
   useEffect(() => {
-    // Check if running inside an iframe (like AI Studio preview)
+    // Check if running inside an iframe
     try {
       setIsInIframe(window.self !== window.top);
     } catch {
@@ -83,20 +108,16 @@ export const DisqusComments: React.FC = () => {
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-b-8 border-indigo-200 text-slate-800">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-5 mb-6 gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-yellow-400 text-indigo-950 flex items-center justify-center font-black shadow-sm shrink-0">
-            <ThumbsUp className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-base font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
-              <span>Player Ratings & Community Forum</span>
-              <Sparkles className="w-4 h-4 text-pink-500" />
-            </h3>
-            <p className="text-xs font-bold text-slate-400">
-              Disqus Forum · shortname: <code className="text-indigo-600 font-mono font-black">geofun</code>
-            </p>
-          </div>
+        <div>
+          <h3 className="text-base font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+            <span>Community Reactions & Forum</span>
+            <Sparkles className="w-4 h-4 text-pink-500" />
+          </h3>
+          <p className="text-xs font-bold text-slate-400">
+            Disqus Forum · shortname: <code className="text-indigo-600 font-mono font-black">geofun</code>
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -122,71 +143,48 @@ export const DisqusComments: React.FC = () => {
         </div>
       </div>
 
-      {/* 1-Click Instant Reaction Bar */}
-      <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">
-        <p className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">
-          Leave quick player feedback (1-Click Thumbs Up):
+      {/* Disqus "What do you think?" Reactions Widget */}
+      <div className="py-6 px-4 bg-white rounded-2xl border border-slate-100 shadow-sm mb-8 text-center">
+        <h4 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mb-1">
+          What do you think?
+        </h4>
+        <p className="text-sm font-semibold text-slate-500 mb-6">
+          {totalResponses} {totalResponses === 1 ? 'Response' : 'Responses'}
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <button
-            onClick={() => handleReaction('thumbsUp')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-sm transition-all border-2 active:scale-95 ${
-              userVoted.thumbsUp
-                ? 'bg-indigo-600 border-indigo-700 text-white shadow-md'
-                : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-700 hover:bg-indigo-50/50'
-            }`}
-          >
-            <ThumbsUp className={`w-4 h-4 ${userVoted.thumbsUp ? 'text-yellow-300' : 'text-indigo-600'}`} />
-            <span>Thumbs Up</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${userVoted.thumbsUp ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-600'}`}>
-              {reactions.thumbsUp}
-            </span>
-          </button>
 
-          <button
-            onClick={() => handleReaction('love')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-sm transition-all border-2 active:scale-95 ${
-              userVoted.love
-                ? 'bg-rose-500 border-rose-600 text-white shadow-md'
-                : 'bg-white border-slate-200 hover:border-rose-300 text-slate-700 hover:bg-rose-50/50'
-            }`}
-          >
-            <Heart className={`w-4 h-4 ${userVoted.love ? 'text-white' : 'text-rose-500'}`} />
-            <span>Love It</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${userVoted.love ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-              {reactions.love}
-            </span>
-          </button>
+        {/* Reaction Options Grid / Flex Row */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">
+          {REACTION_CONFIG.map((item) => {
+            const isSelected = selectedReaction === item.id;
+            const count = reactions[item.id] || 0;
 
-          <button
-            onClick={() => handleReaction('fire')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-sm transition-all border-2 active:scale-95 ${
-              userVoted.fire
-                ? 'bg-amber-500 border-amber-600 text-white shadow-md'
-                : 'bg-white border-slate-200 hover:border-amber-300 text-slate-700 hover:bg-amber-50/50'
-            }`}
-          >
-            <Flame className={`w-4 h-4 ${userVoted.fire ? 'text-yellow-200' : 'text-amber-500'}`} />
-            <span>Addictive</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${userVoted.fire ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-              {reactions.fire}
-            </span>
-          </button>
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleSelectReaction(item.id)}
+                className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer min-w-[70px] sm:min-w-[90px] ${
+                  isSelected
+                    ? 'border-2 border-slate-900 bg-white shadow-md scale-105'
+                    : 'border-2 border-transparent hover:border-slate-200 hover:bg-slate-50/80'
+                }`}
+              >
+                {/* Emoji Icon */}
+                <span className="text-3xl sm:text-4xl select-none mb-1.5 filter drop-shadow-sm transition-transform hover:scale-110">
+                  {item.emoji}
+                </span>
 
-          <button
-            onClick={() => handleReaction('trophy')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-sm transition-all border-2 active:scale-95 ${
-              userVoted.trophy
-                ? 'bg-yellow-500 border-yellow-600 text-slate-950 shadow-md'
-                : 'bg-white border-slate-200 hover:border-yellow-300 text-slate-700 hover:bg-yellow-50/50'
-            }`}
-          >
-            <Trophy className={`w-4 h-4 ${userVoted.trophy ? 'text-slate-950' : 'text-yellow-500'}`} />
-            <span>Geo Master</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${userVoted.trophy ? 'bg-yellow-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-              {reactions.trophy}
-            </span>
-          </button>
+                {/* Response Count */}
+                <span className={`text-base sm:text-lg font-black leading-tight ${isSelected ? 'text-slate-950' : 'text-slate-700'}`}>
+                  {count}
+                </span>
+
+                {/* Label */}
+                <span className={`text-xs sm:text-sm font-bold tracking-tight mt-0.5 ${isSelected ? 'text-slate-950' : 'text-slate-500'}`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
