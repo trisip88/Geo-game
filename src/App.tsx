@@ -12,7 +12,6 @@ import { Header } from './components/Header';
 import { ClueDossier } from './components/ClueDossier';
 import { WorldMap } from './components/WorldMap';
 import { RoundFeedback } from './components/RoundFeedback';
-import { JsonRecordViewer } from './components/JsonRecordViewer';
 import { DisqusComments } from './components/DisqusComments';
 import { MatchSummaryModal } from './components/MatchSummaryModal';
 import { PlaceAuthoringModal } from './components/PlaceAuthoringModal';
@@ -245,11 +244,6 @@ export default function App() {
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         onProbeLiveFeed={handleProbe}
-        onOpenSchema={() => {
-          // Scroll to JSON viewer
-          const el = document.getElementById('json-telemetry-panel');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
         onOpenAuthoring={() => setShowAuthoringModal(true)}
         onOpenHelp={() => setShowHelpModal(true)}
         onOpenDiscussion={() => {
@@ -295,11 +289,6 @@ export default function App() {
               />
             )}
           </div>
-        </div>
-
-        {/* Live Match Record & JSON Schema Panel */}
-        <div id="json-telemetry-panel" className="pt-2">
-          <JsonRecordViewer matchRecord={matchRecord} />
         </div>
 
         {/* Community Discussion Forum (Disqus) */}

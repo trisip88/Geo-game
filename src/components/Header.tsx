@@ -20,7 +20,7 @@ interface HeaderProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   onProbeLiveFeed: () => void;
-  onOpenSchema: () => void;
+  onOpenSchema?: () => void;
   onOpenAuthoring: () => void;
   onOpenHelp: () => void;
   onOpenDiscussion?: () => void;
@@ -147,14 +147,16 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">API Lab</span>
           </button>
 
-          <button
-            onClick={onOpenSchema}
-            title="Inspect JSON Schema & Match Payload"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
-          >
-            <FileCode2 className="w-3.5 h-3.5 text-pink-300" />
-            <span className="hidden sm:inline">Schema</span>
-          </button>
+          {onOpenSchema && (
+            <button
+              onClick={onOpenSchema}
+              title="Inspect JSON Schema & Match Payload"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
+            >
+              <FileCode2 className="w-3.5 h-3.5 text-pink-300" />
+              <span className="hidden sm:inline">Schema</span>
+            </button>
+          )}
 
           <button
             onClick={onOpenHelp}
