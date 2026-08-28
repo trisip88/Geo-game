@@ -29,7 +29,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 HOW TO PLAY & SCORING RULES
               </h2>
               <p className="text-xs font-bold text-slate-400">
-                Random Geography Open-Data Guessing Challenge
+                Geography Guessing Game
               </p>
             </div>
           </div>

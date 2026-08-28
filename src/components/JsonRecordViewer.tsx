@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MatchRecord } from '../types';
-import { RGOGC_JSON_SCHEMA } from '../data/jsonSchema';
+import { GEOGRAPHY_GAME_JSON_SCHEMA } from '../data/jsonSchema';
 import {
   FileJson,
   Copy,
@@ -22,7 +22,7 @@ export const JsonRecordViewer: React.FC<JsonRecordViewerProps> = ({ matchRecord 
   const [copied, setCopied] = useState(false);
 
   const matchJsonString = JSON.stringify(matchRecord, null, 2);
-  const schemaJsonString = JSON.stringify(RGOGC_JSON_SCHEMA, null, 2);
+  const schemaJsonString = JSON.stringify(GEOGRAPHY_GAME_JSON_SCHEMA, null, 2);
 
   const activeContent = activeTab === 'match' ? matchJsonString : schemaJsonString;
 
@@ -33,7 +33,7 @@ export const JsonRecordViewer: React.FC<JsonRecordViewerProps> = ({ matchRecord 
   };
 
   const handleDownload = () => {
-    const filename = activeTab === 'match' ? 'rgogc-match.json' : 'rgogc-schema.json';
+    const filename = activeTab === 'match' ? 'geography-game-match.json' : 'geography-game-schema.json';
     const blob = new Blob([activeContent], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

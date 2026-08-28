@@ -56,7 +56,7 @@ export const MatchSummaryModal: React.FC<MatchSummaryModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'rgogc-match.json';
+    a.download = 'geography-game-match.json';
     a.click();
     URL.revokeObjectURL(url);
   };

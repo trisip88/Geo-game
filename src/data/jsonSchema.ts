@@ -1,7 +1,7 @@
-export const RGOGC_JSON_SCHEMA = {
+export const GEOGRAPHY_GAME_JSON_SCHEMA = {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RGOGC Match Record Schema",
-  "description": "JSON Schema specification for Random Geography Open-data Guessing Challenge match records and round telemetry.",
+  "title": "Geography Guessing Game Match Record Schema",
+  "description": "JSON Schema specification for Geography Guessing Game match records and round telemetry.",
   "type": "object",
   "required": [
     "game",
@@ -18,7 +18,7 @@ export const RGOGC_JSON_SCHEMA = {
   "properties": {
     "game": {
       "type": "string",
-      "enum": ["RGOGC"],
+      "enum": ["Geography Guessing Game"],
       "description": "Identifier for the game"
     },
     "version": {

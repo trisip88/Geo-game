@@ -201,7 +201,7 @@ export default function App() {
     const isMatchComplete = completedRounds.length === TOTAL_ROUNDS;
 
     return {
-      game: 'RGOGC',
+      game: 'Geography Guessing Game',
       version: '1.0',
       generated_at: new Date().toISOString(),
       data_sources: [
@@ -317,7 +317,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-            <span>RGOGC — Random Geography Open-data Guessing Challenge</span>
+            <span>Geography Guessing Game</span>
           </div>
           <div className="flex items-center gap-3 text-indigo-400">
             <span>Wikipedia REST CC BY-SA</span>

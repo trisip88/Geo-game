@@ -53,15 +53,12 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white leading-none">
-                  GEOQUEST
+                <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-none uppercase">
+                  Geography Guessing Game
                 </h1>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-yellow-400 text-indigo-950 tracking-wider shadow-sm">
-                  RGOGC
-                </span>
               </div>
-              <p className="text-[11px] font-bold text-indigo-200 tracking-wide mt-0.5 hidden sm:block">
-                Open-Data Geography Guessing Engine
+              <p className="text-[11px] font-bold text-indigo-200 tracking-wide mt-1 hidden sm:block">
+                Interactive Open-Data Geography Challenge
               </p>
             </div>
           </div>
