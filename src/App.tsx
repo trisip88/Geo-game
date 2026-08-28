@@ -293,11 +293,7 @@ export default function App() {
 
         {/* Community Discussion Forum (Disqus) */}
         <div id="community-discussion-panel" className="pt-2">
-          <DisqusComments
-            articleId="geo-game-main-hub"
-            articleTitle="Geo-Game Community & Player Leaderboard Discussion"
-            language="zh_TW"
-          />
+          <DisqusComments />
         </div>
       </main>
 
