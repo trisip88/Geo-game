@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { MessageSquare, Sparkles, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DiscussionEmbed } from 'disqus-react';
+import { MessageSquare, Sparkles, ExternalLink, RefreshCw } from 'lucide-react';
 
 interface DisqusCommentsProps {
   articleId?: string;
@@ -14,57 +15,26 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
   articleUrl,
   language = 'zh_TW',
 }) => {
+  const [loadKey, setLoadKey] = useState(0);
   const [hasError, setHasError] = useState(false);
 
+  const canonicalUrl =
+    articleUrl ||
+    (typeof window !== 'undefined'
+      ? window.location.href.split('?')[0].split('#')[0]
+      : 'https://github.com/trisip88/Geo-game');
+
+  const disqusConfig = {
+    url: canonicalUrl,
+    identifier: articleId,
+    title: articleTitle,
+    language: language,
+  };
+
   useEffect(() => {
-    try {
-      const canonicalUrl =
-        articleUrl ||
-        (typeof window !== 'undefined'
-          ? window.location.href.split('?')[0].split('#')[0]
-          : 'https://github.com/trisip88/Geo-game');
-
-      // Setup window.disqus_config
-      (window as any).disqus_config = function () {
-        this.page.url = canonicalUrl;
-        this.page.identifier = articleId;
-        this.page.title = articleTitle;
-        this.language = language;
-      };
-
-      // Check if script already exists
-      const existingScript = document.getElementById('disqus-embed-script');
-      if (!existingScript) {
-        const d = document;
-        const s = d.createElement('script');
-        s.id = 'disqus-embed-script';
-        s.src = 'https://geo-game.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', (+new Date()).toString());
-        s.async = true;
-        s.onerror = () => {
-          setHasError(true);
-        };
-        (d.head || d.body).appendChild(s);
-      } else if ((window as any).DISQUS) {
-        // If already loaded, reset for new identifier/url
-        try {
-          (window as any).DISQUS.reset({
-            reload: true,
-            config: function () {
-              this.page.url = canonicalUrl;
-              this.page.identifier = articleId;
-              this.page.title = articleTitle;
-              this.language = language;
-            },
-          });
-        } catch {
-          // Ignore reset errors during unmounts
-        }
-      }
-    } catch {
-      setHasError(true);
-    }
-  }, [articleId, articleTitle, articleUrl, language]);
+    // Reset error status on key change
+    setHasError(false);
+  }, [loadKey]);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-b-8 border-indigo-200 text-slate-800">
@@ -85,25 +55,39 @@ export const DisqusComments: React.FC<DisqusCommentsProps> = ({
         </div>
       </div>
 
-      <div className="min-h-[220px] w-full">
+      <div className="min-h-[200px] w-full" key={loadKey}>
         {hasError ? (
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3 text-slate-600 text-xs font-medium">
-            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-            <span>
-              Disqus embed could not be loaded directly (may be blocked by browser privacy/ad-block settings). You can also participate directly on the{' '}
+          <div className="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex flex-col items-center text-center gap-3 text-slate-700">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-black text-slate-900 text-sm">Disqus Discussion Channel</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-md">
+                Disqus comments can be accessed directly on the forum channel.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 mt-2">
+              <button
+                onClick={() => setLoadKey((k) => k + 1)}
+                className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 flex items-center gap-1.5 transition-colors shadow-sm"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Retry Embed</span>
+              </button>
               <a
                 href="https://disqus.com/home/forums/geo-game/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-600 underline font-bold"
+                className="px-5 py-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-black flex items-center gap-1.5 shadow-[0_3px_0_#9D174D] active:translate-y-0.5 active:shadow-none transition-all"
               >
-                geo-game forum channel
+                <span>Open Geo-Game Forum</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
-              .
-            </span>
+            </div>
           </div>
         ) : (
-          <div id="disqus_thread" />
+          <DiscussionEmbed shortname="geo-game" config={disqusConfig} />
         )}
       </div>
     </div>
