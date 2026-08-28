@@ -73,8 +73,8 @@ export const DisqusComments: React.FC = () => {
 
     // Set Disqus configuration for geofun
     (window as any).disqus_config = function (this: any) {
-      this.page.url = window.location.href.split('#')[0];
-      this.page.identifier = 'geo-game-forum';
+      this.page.url = window.location.origin + window.location.pathname;
+      this.page.identifier = 'geo-game-geofun-thread';
       this.page.title = 'Geo Game Discussion';
     };
 
